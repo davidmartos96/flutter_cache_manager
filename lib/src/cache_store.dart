@@ -23,6 +23,8 @@ class CacheStore {
   final int _capacity;
   final Duration _maxAge;
 
+  Duration get maxAge => _maxAge;
+
   DateTime lastCleanupRun = DateTime.now();
   static const Duration cleanupRunMinInterval = Duration(seconds: 10);
   Timer _scheduledCleanup;

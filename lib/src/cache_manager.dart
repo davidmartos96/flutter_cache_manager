@@ -144,10 +144,16 @@ abstract class BaseCacheManager {
   }
 
   ///Download the file and add to cache
-  Future<FileInfo> downloadFile(String url,
-      {Map<String, String> authHeaders, bool force = false}) async {
+  Future<FileInfo> downloadFile(
+    String url, {
+    Map<String, String> authHeaders,
+    bool force = false,
+    ignoreHttpCacheHeaders = false,
+  }) async {
     return await _webHelper.downloadFile(url,
-        authHeaders: authHeaders, ignoreMemCache: force);
+        authHeaders: authHeaders,
+        ignoreMemCache: force,
+        ignoreHttpCacheHeaders: ignoreHttpCacheHeaders);
   }
 
   ///Get the file from the cache

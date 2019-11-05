@@ -26,14 +26,21 @@ class WebHelper {
   }
 
   ///Download the file from the url
-  Future<FileInfo> downloadFile(String url,
-      {Map<String, String> authHeaders, bool ignoreMemCache = false}) async {
+  Future<FileInfo> downloadFile(
+    String url, {
+    Map<String, String> authHeaders,
+    bool ignoreMemCache = false,
+    ignoreHttpCacheHeaders = false,
+  }) async {
     if (!_memCache.containsKey(url) || ignoreMemCache) {
       var completer = new Completer<FileInfo>();
       () async {
         try {
-          final cacheObject =
-              await _downloadRemoteFile(url, authHeaders: authHeaders);
+          final cacheObject = await _downloadRemoteFile(
+            url,
+            authHeaders: authHeaders,
+            ignoreHttpCacheHeaders: ignoreHttpCacheHeaders,
+          );
           completer.complete(cacheObject);
         } catch (e) {
           completer.completeError(e);
@@ -48,8 +55,11 @@ class WebHelper {
   }
 
   ///Download the file from the url
-  Future<FileInfo> _downloadRemoteFile(String url,
-      {Map<String, String> authHeaders}) async {
+  Future<FileInfo> _downloadRemoteFile(
+    String url, {
+    Map<String, String> authHeaders,
+    ignoreHttpCacheHeaders = false,
+  }) async {
     var cacheObject = await _store.retrieveCacheData(url);
     if (cacheObject == null) {
       cacheObject = new CacheObject(url);
@@ -72,6 +82,11 @@ class WebHelper {
     if (!success) {
       throw HttpException(
           "No valid statuscode. Statuscode was ${response?.statusCode}");
+    }
+
+    if (ignoreHttpCacheHeaders) {
+      cacheObject.validTill =
+          cacheObject.validTill = new DateTime.now().add(_store.maxAge);
     }
 
     _store.putFile(cacheObject);
